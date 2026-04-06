@@ -41,24 +41,33 @@ STEP 1 — DATA EXTRACTION & ANALYSIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Extract the following from the receipt:
 - Merchant Name
-- Date on Receipt
+- Receipt / Billing Date (for hotels, this is the CHECK-OUT / billing date printed on the invoice)
 - Total Amount
 - Currency
 
+IMPORTANT — HOTEL RECEIPTS:
+Hotel invoices show BOTH a check-in date and a check-out date. This is completely normal.
+- The "receipt_date" you extract should be the CHECK-OUT / billing date.
+- Do NOT flag the presence of a check-in date that is earlier than the check-out date — that is expected.
+- Only flag a date anomaly if the check-out date is BEFORE the check-in date on the SAME receipt (genuine data entry error).
+
 Analyze the receipt against the Policy and Employee Context:
-- Compare the "Date on Receipt" against the Employee "Claimed Expense Date" ({claimed_date}). If they don't match or the receipt date is unreadable, you MUST flag/reject the claim.
-- Evaluate the employee's "Business Purpose" ({business_purpose}) against the contextual evidence in the receipt (e.g. social gathering items claimed as 'Office Supplies') and check if the policy explicitly permits or prohibits this context.
+- Compare the extracted receipt/billing date against the Employee "Claimed Expense Date" ({claimed_date}).
+  If they don't match OR the receipt date is unreadable, FLAG the claim (do not auto-reject unless clearly impossible).
+- Evaluate the employee's "Business Purpose" ({business_purpose}) against the contextual evidence in the receipt
+  (e.g. social gathering items claimed as 'Office Supplies') and check if the policy explicitly permits or prohibits this context.
 - If the image is extremely blurry or unreadable, immediately reject.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 STEP 2 — FAKE RECEIPT DETECTION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Carefully examine the receipt for fraud signals:
-1. Font inconsistency.
-2. Suspiciously round totals.
-3. Missing mandatory fields.
-4. Date / Time anomalies (transaction between 12 AM - 5 AM).
-5. Mismatched Totals.
+1. Font inconsistency (mixed fonts suggesting digital editing).
+2. Suspiciously round totals with no line-item breakdown.
+3. Missing mandatory fields (no merchant name, no date, no total).
+4. Transaction TIME anomaly: billing time printed on the receipt is between 12:00 AM and 5:00 AM.
+   NOTE: Do NOT flag because a receipt shows both a check-in and check-out date — that is normal for hotels.
+5. Mismatched totals (line items don't add up to the stated total).
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 RESPOND WITH ONLY A VALID JSON OBJECT.
@@ -68,21 +77,24 @@ No markdown, no code fences, no extra text.
 Use exactly these keys:
 
 {{
-  "merchant_name": "extracted merchant, or 'Unreadable/Missing'",
-  "receipt_date": "extracted date, or 'Unreadable/Missing'",
-  "extracted_amount": "total amount with symbol, or 'Unreadable/Missing'",
-  "currency": "extracted currency",
+  "merchant_name": "extracted merchant name, or 'Unreadable/Missing'",
+  "receipt_date": "extracted billing/check-out date as shown on receipt, or 'Unreadable/Missing'",
+  "extracted_amount": "total amount with currency symbol, or 'Unreadable/Missing'",
+  "currency": "currency code or symbol extracted from receipt",
   "verdict": "APPROVED" or "FLAGGED" or "REJECTED",
-  "reason": "Draft exactly ONE concise sentence explaining the verdict. YOU MUST explicitly cite the specific policy rule or limit referenced if rejected/flagged.",
-  "violations": "list any specific policy rules broken, or None",
+  "reason": "One concise sentence explaining the verdict. Cite the specific policy rule if rejected/flagged.",
+  "violations": "Plain text description of policy rules broken, separated by semicolons. Write None if no violations.",
   "fake_risk": "LOW" or "MEDIUM" or "HIGH",
-  "fake_reasons": "list every fraud signal detected, or None if clean"
+  "fake_reasons": "Plain text description of each fraud signal detected, separated by semicolons. Write None if receipt appears genuine."
 }}
+
+IMPORTANT: The 'violations' and 'fake_reasons' fields MUST be plain readable strings, NOT Python lists or arrays.
+DO NOT use square brackets, quotes, or Python list syntax. Just plain text with semicolons as separators.
 
 Verdict definitions:
   APPROVED  → Expense clearly follows all policy rules, dates match, context makes sense, AND fake_risk is LOW.
-  FLAGGED   → Something is unclear/missing, dates mismatch slightly, needs human review, OR fake_risk is MEDIUM.
-  REJECTED  → Clearly violates policy rules, unreadable receipt, OR fake_risk is HIGH.
+  FLAGGED   → Something is unclear/missing, minor date discrepancy, needs human review, OR fake_risk is MEDIUM.
+  REJECTED  → Clearly violates policy rules, unreadable receipt, dates impossible, OR fake_risk is HIGH.
 """
 
     config = types.GenerateContentConfig(
