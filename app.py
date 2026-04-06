@@ -505,7 +505,7 @@ with st.sidebar:
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8A8A8E; margin-top:6px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#3DBA7A;display:inline-block;"></span>
-                Gemini 2.5 Flash
+                Gemini 2.0 Flash
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8A8A8E; margin-top:6px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#3DBA7A;display:inline-block;"></span>
@@ -673,7 +673,7 @@ if page == "◆  Audit Console":
             </div>
             <div class="hero-title">Verif<span>EYE</span></div>
             <div class="hero-sub">
-                Intelligent receipt auditing powered by Gemini 2.5 Flash. Upload any expense receipt and get a policy-grounded verdict in seconds.
+                Intelligent receipt auditing powered by Gemini 2.0 Flash. Upload any expense receipt and get a policy-grounded verdict in seconds.
             </div>
             <div class="hero-stat-row">
                 <div>
@@ -746,8 +746,20 @@ if page == "◆  Audit Console":
                     business_purpose=business_purpose,
                     mime_type=mime_type
                 )
-                save_audit(uploaded_file.name, business_purpose, str(claimed_date), result["verdict"], result["reason"])
-                st.session_state.single_result = result
+                # Detect quota/API errors and show a friendly message instead of a broken result card
+                if result.get("verdict") == "ERROR" or "quota exceeded" in result.get("reason", "").lower() or "api error" in result.get("reason", "").lower():
+                    reason = result.get("reason", "Unknown API error.")
+                    if "quota" in reason.lower() or "429" in reason or "resource_exhausted" in reason.lower():
+                        st.error(
+                            "🛑 **Gemini API Quota Exceeded**\n\n"
+                            "You have reached your daily free-tier limit (20 requests/day for this model). "
+                            "Please wait ~24 hours for your quota to reset, or upgrade your Google AI API plan at [ai.dev](https://ai.dev)."
+                        )
+                    else:
+                        st.error(f"❌ **API Error:** {reason}")
+                else:
+                    save_audit(uploaded_file.name, business_purpose, str(claimed_date), result["verdict"], result["reason"])
+                    st.session_state.single_result = result
 
     # ── RESULTS ──
     if st.session_state.single_result:

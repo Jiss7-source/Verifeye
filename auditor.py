@@ -111,7 +111,7 @@ Verdict definitions:
                     f"Please audit this expense receipt ({filename}):\n\n{content}"
                 )
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-2.0-flash",
                     contents=user_prompt,
                     config=config
                 )
@@ -126,7 +126,7 @@ Verdict definitions:
                     "Read ALL visible text carefully — including small print."
                 )
                 response = client.models.generate_content(
-                    model="gemini-2.5-flash",
+                    model="gemini-2.0-flash",
                     contents=[user_prompt, image_part],
                     config=config
                 )
@@ -138,11 +138,18 @@ Verdict definitions:
 
         except Exception as e:
             error_str = str(e)
-            if "429" in error_str and attempt < max_retries - 1:
-                wait = 20 * (attempt + 1)
-                print(f"[auditor] Rate limit — waiting {wait}s (attempt {attempt+1}/{max_retries})…")
-                time.sleep(wait)
-                continue
+            # Handle quota / rate-limit errors with a clean message
+            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+                if attempt < max_retries - 1:
+                    wait = 20 * (attempt + 1)
+                    print(f"[auditor] Rate limit — waiting {wait}s (attempt {attempt+1}/{max_retries})…")
+                    time.sleep(wait)
+                    continue
+                else:
+                    return _error_result(
+                        "API quota exceeded. You have hit your daily free-tier limit for the Gemini API. "
+                        "Please wait ~24 hours for your quota to reset, or upgrade your Google AI plan."
+                    )
             else:
                 return _error_result(f"Gemini API error: {error_str}", raw=error_str)
 
