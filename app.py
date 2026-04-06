@@ -505,7 +505,7 @@ with st.sidebar:
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8A8A8E; margin-top:6px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#3DBA7A;display:inline-block;"></span>
-                Gemini 2.0 Flash
+                Gemini 1.5 Flash
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8A8A8E; margin-top:6px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#3DBA7A;display:inline-block;"></span>
@@ -673,7 +673,7 @@ if page == "◆  Audit Console":
             </div>
             <div class="hero-title">Verif<span>EYE</span></div>
             <div class="hero-sub">
-                Intelligent receipt auditing powered by Gemini 2.0 Flash. Upload any expense receipt and get a policy-grounded verdict in seconds.
+                Intelligent receipt auditing powered by Gemini 1.5 Flash. Upload any expense receipt and get a policy-grounded verdict in seconds.
             </div>
             <div class="hero-stat-row">
                 <div>

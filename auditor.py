@@ -111,7 +111,7 @@ Verdict definitions:
                     f"Please audit this expense receipt ({filename}):\n\n{content}"
                 )
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-1.5-flash",
                     contents=user_prompt,
                     config=config
                 )
@@ -126,7 +126,7 @@ Verdict definitions:
                     "Read ALL visible text carefully — including small print."
                 )
                 response = client.models.generate_content(
-                    model="gemini-2.0-flash",
+                    model="gemini-1.5-flash",
                     contents=[user_prompt, image_part],
                     config=config
                 )
