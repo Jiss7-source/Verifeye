@@ -69,3 +69,25 @@ def get_file_content(uploaded_file):
     else:
         # We don't support this file type (e.g. Excel, Word doc, etc.)
         return None, "unsupported"
+
+def load_policy_text(policy_path="expense_policy.pdf"):
+    """
+    Reads the university expense policy PDF once at startup.
+    Returns the full text as a string.
+    """
+    try:
+        doc = fitz.open(policy_path)
+        policy_text = ""
+        for page in doc:
+            policy_text += page.get_text()
+        doc.close()
+
+        if not policy_text.strip():
+            return None, "Policy PDF appears to be a scanned image — text could not be read."
+        
+        return policy_text, "ok"
+    
+    except FileNotFoundError:
+        return None, "expense_policy.pdf not found. Place it in your project folder."
+    except Exception as e:
+        return None, f"Error reading policy: {str(e)}"

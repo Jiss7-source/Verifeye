@@ -9,32 +9,11 @@ DB_NAME = "audit_history.db"
 def _get_connection():
     """
     A private helper that opens a connection to the database.
-
-    The underscore at the start (_) is a Python convention meaning
-    "this is meant for internal use only — don't call this from app.py".
-
-    sqlite3.connect() either opens the existing .db file or creates it
-    fresh if it doesn't exist yet. Think of it like opening a filing cabinet.
     """
     return sqlite3.connect(DB_NAME)
 
 
 def init_db():
-    """
-    Creates the audits table if it doesn't already exist.
-
-    Call this ONCE when your app starts up (at the top of app.py).
-    It's safe to call multiple times — the IF NOT EXISTS part means
-    it won't wipe your data if the table already exists.
-
-    The table has these columns:
-        id        -> auto-numbered (1, 2, 3...), used as a unique identifier
-        filename  -> the name of the uploaded file (e.g. "receipt.pdf")
-        verdict   -> the AI's decision (e.g. "APPROVED", "FLAGGED", "REJECTED")
-        summary   -> the AI's explanation of its verdict
-        flagged   -> 1 if the expense was flagged, 0 if it passed (easy to filter)
-        timestamp -> when the audit happened (e.g. "2025-01-15 14:32")
-    """
     conn = _get_connection()
     try:
         cursor = conn.cursor()
@@ -48,20 +27,24 @@ def init_db():
                 timestamp TEXT    NOT NULL
             )
         """)
+        
+        # Migration: Add new columns for Feature 1 and Feature 3 if they don't exist
+        try:
+            cursor.execute("ALTER TABLE audits ADD COLUMN business_purpose TEXT")
+            cursor.execute("ALTER TABLE audits ADD COLUMN claimed_date TEXT")
+            cursor.execute("ALTER TABLE audits ADD COLUMN human_comment TEXT")
+            cursor.execute("ALTER TABLE audits ADD COLUMN human_verdict TEXT")
+        except sqlite3.OperationalError:
+            pass  # Columns already exist
+
         conn.commit()
     finally:
         conn.close()  # Always close, even if something crashes above
 
 
-def save_audit(filename, verdict, summary):
+def save_audit(filename, business_purpose, claimed_date, verdict, summary):
     """
-    Saves one audit result into the database.
-
-    Call this in app.py after Gemini returns its verdict, like:
-        save_audit("receipt.pdf", "FLAGGED", "Amount exceeds policy limit.")
-
-    The 'flagged' column is set to 1 automatically if the verdict
-    is not APPROVED — this makes filtering easy later.
+    Saves one audit result into the database, now tracking business purpose and date.
     """
     flagged = 0 if verdict.upper() == "APPROVED" else 1
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -69,34 +52,46 @@ def save_audit(filename, verdict, summary):
     conn = _get_connection()
     try:
         cursor = conn.cursor()
+        
+        # Check if new columns exist by trying to insert into them
+        # if it fails because it's an old DB and migration didn't run, we fallback.
         cursor.execute("""
-            INSERT INTO audits (filename, verdict, summary, flagged, timestamp)
-            VALUES (?, ?, ?, ?, ?)
-        """, (filename, verdict, summary, flagged, timestamp))
-        # The ? placeholders prevent SQL injection — a basic security best practice.
-        # Never build SQL strings using f-strings or + with user data.
+            INSERT INTO audits (filename, business_purpose, claimed_date, verdict, summary, flagged, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (filename, business_purpose, claimed_date, verdict, summary, flagged, timestamp))
+        
         conn.commit()
     finally:
         conn.close()
 
-
-def get_all_audits():
+def update_audit_override(audit_id, human_comment, human_verdict):
     """
-    Returns all past audit results, newest first.
-
-    Each row comes back as a tuple like:
-        (id, filename, verdict, summary, flagged, timestamp)
-
-    In app.py you can loop through them like:
-        for row in get_all_audits():
-            print(row[1])  # filename
-            print(row[2])  # verdict
+    Allows a human to override the AI verdict and add a comment.
     """
     conn = _get_connection()
     try:
         cursor = conn.cursor()
+        flagged = 0 if human_verdict.upper() == "APPROVED" else 1
+        cursor.execute("""
+            UPDATE audits 
+            SET human_comment = ?, human_verdict = ?, flagged = ? 
+            WHERE id = ?
+        """, (human_comment, human_verdict, flagged, audit_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+def get_all_audits():
+    """
+    Returns all past audit results, newest first.
+    Returns: list of dicts.
+    """
+    conn = _get_connection()
+    conn.row_factory = sqlite3.Row  # Access columns by name
+    try:
+        cursor = conn.cursor()
         cursor.execute("SELECT * FROM audits ORDER BY id DESC")
-        rows = cursor.fetchall()
+        rows = [dict(r) for r in cursor.fetchall()]
         return rows
     finally:
         conn.close()
@@ -105,15 +100,13 @@ def get_all_audits():
 def get_flagged_audits():
     """
     Returns only the audits that were flagged or rejected.
-
-    Useful for a dashboard that shows 'problem expenses' separately
-    from approved ones. Good detail to mention in your presentation!
     """
     conn = _get_connection()
+    conn.row_factory = sqlite3.Row
     try:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM audits WHERE flagged = 1 ORDER BY id DESC")
-        rows = cursor.fetchall()
+        rows = [dict(r) for r in cursor.fetchall()]
         return rows
     finally:
         conn.close()
@@ -122,9 +115,6 @@ def get_flagged_audits():
 def delete_all_audits():
     """
     Clears all records from the database.
-
-    Useful for a 'Clear History' button in your Streamlit app.
-    The table itself stays — only the data inside is deleted.
     """
     conn = _get_connection()
     try:
