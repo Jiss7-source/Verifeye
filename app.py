@@ -209,12 +209,19 @@ label[data-testid="stWidgetLabel"] p {
 .stButton > button:active { transform: translateY(0) !important; }
 
 /* ── FILE UPLOADER ── */
+[data-testid="stFileUploader"] { background-color: transparent !important; }
+[data-testid="stFileUploader"] > div { background-color: transparent !important; }
 [data-testid="stFileUploadDropzone"] {
     background-color: var(--bg-elevated) !important;
     border: 1px dashed var(--amber) !important; border-radius: 10px !important;
     transition: background 0.2s ease;
 }
 [data-testid="stFileUploadDropzone"]:hover { background-color: var(--amber-dim) !important; }
+[data-testid="stFileUploadDropzone"] * { color: var(--text-primary) !important; }
+[data-testid="stFileUploader"] section { background-color: var(--bg-card) !important; color: var(--text-primary) !important; border: 1px solid var(--border-subtle) !important; }
+[data-testid="stFileUploader"] section * { color: var(--text-primary) !important; }
+[data-testid="stFileUploader"] small { color: var(--text-secondary) !important; }
+[data-testid="stFileUploader"] div [data-testid="stMarkdownContainer"] p { color: var(--text-primary) !important; }
 
 /* ── SELECTBOX ── */
 [data-testid="stSelectbox"] > div > div {
@@ -266,15 +273,16 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 
 /* ── SECTION LABEL ── */
 .section-label {
-    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber);
-    text-transform: uppercase; letter-spacing: 0.2em; text-align: center;
-    margin: 2rem 0 1.5rem; position: relative;
+    font-family: 'Syne', sans-serif; font-size: 18px; color: #E8C84A; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.15em; text-align: center;
+    margin: 3.5rem 0 2rem; position: relative;
+    text-shadow: 0 0 10px rgba(232,184,75,0.3);
 }
 .section-label::before, .section-label::after {
-    content: ''; position: absolute; top: 50%; width: 30%; height: 1px; background: var(--border-subtle);
+    content: ''; position: absolute; top: 50%; width: 25%; height: 1px;
 }
-.section-label::before { left: 0; }
-.section-label::after  { right: 0; }
+.section-label::before { left: 0; background: linear-gradient(90deg, transparent, var(--amber)); }
+.section-label::after  { right: 0; background: linear-gradient(270deg, transparent, var(--amber)); }
 
 /* ── DATA FIELDS (Ledger) ── */
 .data-field { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 14px 18px; margin-bottom: 10px; }
@@ -284,8 +292,9 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 /* ── PILLAR CARDS ── */
 .pillar-card {
     background: var(--bg-card); border: 1px solid var(--border-subtle);
-    border-radius: 12px; padding: 28px 24px; height: 100%;
+    border-radius: 12px; padding: 40px 32px; height: 100%; min-height: 340px;
     transition: all 0.3s ease; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; justify-content: flex-start;
 }
 .pillar-card::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -293,30 +302,30 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 }
 .pillar-card:hover::before { opacity: 1; }
 .pillar-card:hover { border-color: var(--border-active); box-shadow: 0 12px 40px rgba(212,175,55,0.08); transform: translateY(-2px); }
-.pillar-number { font-family: 'Syne', sans-serif; font-size: 48px; font-weight: 800; color: var(--amber); opacity: 0.25; line-height: 1; margin-bottom: 8px; }
-.pillar-title  { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
-.pillar-body   { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+.pillar-number { font-family: 'Syne', sans-serif; font-size: 80px; font-weight: 800; color: #FFE066; opacity: 0.9; line-height: 1; margin-bottom: 16px; text-shadow: 0 0 12px rgba(255, 224, 102, 0.4); }
+.pillar-title  { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.01em; }
+.pillar-body   { font-size: 16px; color: var(--text-secondary); line-height: 1.7; }
 
 /* ── HERO ── */
 .hero-eyebrow {
-    font-family: 'DM Mono', monospace; font-size: 11px; color: var(--amber);
+    font-family: 'DM Mono', monospace; font-size: 14px; color: var(--amber);
     text-transform: uppercase; letter-spacing: 0.3em; margin-bottom: 16px;
     animation: fadeSlideUp 0.6s ease 0.1s both;
 }
 .hero-title {
-    font-family: 'Syne', sans-serif; font-size: clamp(52px, 8vw, 96px);
+    font-family: 'Syne', sans-serif; font-size: clamp(64px, 10vw, 110px);
     font-weight: 800; line-height: 0.95; color: var(--text-primary);
     letter-spacing: -0.04em; margin-bottom: 20px;
     animation: fadeSlideDown 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both;
 }
 .hero-title span { color: var(--amber); }
 .hero-sub {
-    font-size: 16px; color: var(--text-secondary); line-height: 1.7; max-width: 480px;
+    font-size: 20px; color: var(--text-secondary); line-height: 1.7; max-width: 600px;
     animation: fadeSlideUp 0.6s ease 0.3s both;
 }
-.hero-stat-row { display: flex; gap: 32px; margin-top: 32px; animation: fadeSlideUp 0.6s ease 0.4s both; }
-.hero-stat-val { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; color: var(--amber); }
-.hero-stat-label { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 2px; }
+.hero-stat-row { display: flex; gap: 40px; margin-top: 40px; animation: fadeSlideUp 0.6s ease 0.4s both; }
+.hero-stat-val { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 700; color: var(--amber); }
+.hero-stat-label { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
 
 /* ── PULSE DOT ── */
 .pulse-dot {
@@ -779,9 +788,9 @@ if page == "◆  Audit Console":
 
     p1, p2, p3 = st.columns(3)
     pillars = [
-        ("01", "Policy Intelligence", "Cross-references every line item against your organisation's expense rules — limits, prohibited categories, and receipt requirements."),
-        ("02", "Fraud Detection", "Runs 7 forensic checks: font consistency, round-number flags, GST validation, timestamp anomalies, and total reconciliation."),
-        ("03", "Immutable Ledger", "Every audit is logged to a tamper-evident SQLite record with full support for human supervisor override and audit trails."),
+        ("01", "Digital Receipt Ingestion", "Extracts Merchant, Date, Amount, and Currency via OCR, validating context through employee justification."),
+        ("02", "Policy Cross-Reference", "Validates spend logic against corporate rules for limits, prohibitions, and contextual constraints."),
+        ("03", "Intelligent Flagging", "Routes claims to a human-in-the-loop dashboard with automated traffic-light verdicts and exact policy citations."),
     ]
     for col, (num, title, body) in zip([p1, p2, p3], pillars):
         with col:

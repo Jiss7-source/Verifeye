@@ -1,22 +1,34 @@
- HEAD
-# Expense_Auditor
+# VerifEYE — Expense Auditor
 
-# 🧾 Policy-First Expense Auditor
+## The Problem
+Manual expense auditing is slow, error-prone, and susceptible to fraud or policy violations. Finance teams spend countless hours verifying receipts against complex corporate policies, leading to delayed reimbursements and operational friction.
 
-An AI-powered web app that audits expense receipts against company policy.
-
-## Features
-- Upload PDF or image receipts
-- AI analysis using Google Gemini
-- Instant verdict: Approved / Rejected / Needs Review
-- Audit history saved locally
-
-## How to Run
-1. Clone this repo
-2. Install dependencies: `pip install -r requirements.txt`
-3. Add your Gemini API key to `.env`
-4. Run: `streamlit run app.py`
+## The Solution
+VerifEYE is an AI-powered compliance engine that automates receipt auditing. By leveraging advanced Vision language models, it instantly extracts receipt data, cross-references it against customizable corporate policies, and routes claims through a human-in-the-loop dashboard with automated traffic-light verdicts (Approved, Flagged, Rejected) and fraud signal detection.
 
 ## Tech Stack
-- Python, Streamlit, Google Gemini AI, SQLite, PyMuPDF
-242b47e (Initial Commit)
+- **Programming Language**: Python
+- **Framework**: Streamlit
+- **Database**: SQLite
+- **APIs & Models**: Groq Llama Models (Vision & Text)
+- **Utilities**: PyMuPDF (PDF Parsing)
+
+## Setup Instructions
+
+### 1. Clone the repository and install dependencies
+```bash
+pip install streamlit python-dotenv groq pymupdf
+```
+
+### 2. Environment Variables
+Create a `.env` file in the root of the project to securely store your API keys or put it in `.streamlit/secrets.toml`:
+```env
+GROQ_API_KEY="your-groq-api-key-here"
+```
+
+### 3. Run the project locally
+Launch the app via Streamlit:
+```bash
+streamlit run app.py
+```
+Open the provided local URL (typically http://localhost:8501) in your browser.
