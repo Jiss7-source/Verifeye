@@ -292,7 +292,7 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 /* ── PILLAR CARDS ── */
 .pillar-card {
     background: var(--bg-card); border: 1px solid var(--border-subtle);
-    border-radius: 12px; padding: 40px 32px; height: 100%; min-height: 340px;
+    border-radius: 12px; padding: 40px 32px; height: 380px;
     transition: all 0.3s ease; position: relative; overflow: hidden;
     display: flex; flex-direction: column; justify-content: flex-start;
 }
@@ -302,8 +302,8 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 }
 .pillar-card:hover::before { opacity: 1; }
 .pillar-card:hover { border-color: var(--border-active); box-shadow: 0 12px 40px rgba(212,175,55,0.08); transform: translateY(-2px); }
-.pillar-number { font-family: 'Syne', sans-serif; font-size: 80px; font-weight: 800; color: #FFE066; opacity: 0.9; line-height: 1; margin-bottom: 16px; text-shadow: 0 0 12px rgba(255, 224, 102, 0.4); }
-.pillar-title  { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.01em; }
+.pillar-number { font-family: 'Syne', sans-serif; font-size: 92px; font-weight: 900; color: #FFF099; opacity: 1; line-height: 1; margin-bottom: 20px; text-shadow: 0 0 20px rgba(255, 240, 153, 0.6); }
+.pillar-title  { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 900; color: #FFFFFF; margin-bottom: 14px; letter-spacing: -0.01em; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); }
 .pillar-body   { font-size: 16px; color: var(--text-secondary); line-height: 1.7; }
 
 /* ── HERO ── */

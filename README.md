@@ -1,34 +1,31 @@
-# VerifEYE — Expense Auditor
+# VerifEYE - Intelligent Expense Auditor
 
 ## The Problem
-Manual expense auditing is slow, error-prone, and susceptible to fraud or policy violations. Finance teams spend countless hours verifying receipts against complex corporate policies, leading to delayed reimbursements and operational friction.
+A lot of fake, out-of-policy expenses pass through manual team approvals every day, leaking significant company resources. Auditing takes massive manual effort which companies struggle to keep up with, leading to delayed reimbursements and lack of compliance visibility.
 
 ## The Solution
-VerifEYE is an AI-powered compliance engine that automates receipt auditing. By leveraging advanced Vision language models, it instantly extracts receipt data, cross-references it against customizable corporate policies, and routes claims through a human-in-the-loop dashboard with automated traffic-light verdicts (Approved, Flagged, Rejected) and fraud signal detection.
+VerifEYE provides an AI-powered compliance engine that uses an intelligent LLM Vision API (Groq Llama 90B Vision) to ingest digital receipts and validate their contextual business purpose directly against custom company policies. A simple traffic-light system combined with an explicit compliance ledger makes detecting and blocking anomalous or prohibited outlays fully automated, giving peace of mind and time back to finance teams.
 
 ## Tech Stack
-- **Programming Language**: Python
-- **Framework**: Streamlit
-- **Database**: SQLite
-- **APIs & Models**: Groq Llama Models (Vision & Text)
-- **Utilities**: PyMuPDF (PDF Parsing)
+- **Python** (Core application logic)
+- **Streamlit** (Frontend interface and state management)
+- **Groq API / Llama 3.2 90B Vision** (AI intelligence, reasoning and OCR)
+- **SQLite** (Human-in-the-loop expense ledger database)
 
 ## Setup Instructions
-
-### 1. Clone the repository and install dependencies
-```bash
-pip install streamlit python-dotenv groq pymupdf
-```
-
-### 2. Environment Variables
-Create a `.env` file in the root of the project to securely store your API keys or put it in `.streamlit/secrets.toml`:
-```env
-GROQ_API_KEY="your-groq-api-key-here"
-```
-
-### 3. Run the project locally
-Launch the app via Streamlit:
-```bash
-streamlit run app.py
-```
-Open the provided local URL (typically http://localhost:8501) in your browser.
+1. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. **Configure APIs:**
+   Create a `.streamlit/secrets.toml` or `.env` file in the project root containing your Groq API key:
+   ```toml
+   # .streamlit/secrets.toml
+   GROQ_API_KEY = "your_groq_api_key_here"
+   ```
+3. **Run the project locally:**
+   Start the Streamlit application using the command below:
+   ```bash
+   streamlit run app.py
+   ```
+   *The application will open automatically in your default web browser.*
