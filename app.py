@@ -273,10 +273,10 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 
 /* ── SECTION LABEL ── */
 .section-label {
-    font-family: 'Syne', sans-serif; font-size: 32px; color: #E8C84A; font-weight: 900;
+    font-family: 'Syne', sans-serif; font-size: 24px; color: #E8C84A; font-weight: 800;
     text-transform: uppercase; letter-spacing: 0.15em; text-align: center;
-    margin: 6rem 0 3.5rem; position: relative;
-    text-shadow: 0 0 16px rgba(232,184,75,0.5);
+    margin: 4.5rem 0 2.5rem; position: relative;
+    text-shadow: 0 0 10px rgba(232,184,75,0.4);
 }
 .section-label::before, .section-label::after {
     content: ''; position: absolute; top: 50%; width: 25%; height: 1px;
@@ -292,7 +292,7 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 /* ── PILLAR CARDS ── */
 .pillar-card {
     background: var(--bg-card); border: 1px solid var(--border-subtle);
-    border-radius: 12px; padding: 50px 40px; height: 460px;
+    border-radius: 12px; padding: 32px 28px; min-height: 280px;
     transition: all 0.3s ease; position: relative; overflow: hidden;
     display: flex; flex-direction: column; justify-content: flex-start;
 }
@@ -302,9 +302,9 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 }
 .pillar-card:hover::before { opacity: 1; }
 .pillar-card:hover { border-color: var(--border-active); box-shadow: 0 12px 40px rgba(212,175,55,0.08); transform: translateY(-2px); }
-.pillar-number { font-family: 'Syne', sans-serif; font-size: 110px; font-weight: 900; color: #FFF099; opacity: 1; line-height: 1; margin-bottom: 24px; text-shadow: 0 0 24px rgba(255, 240, 153, 0.7); }
-.pillar-title  { font-family: 'Syne', sans-serif; font-size: 38px; font-weight: 900; color: #FFFFFF; margin-bottom: 18px; letter-spacing: -0.01em; text-shadow: 0 0 12px rgba(255, 255, 255, 0.5); }
-.pillar-body   { font-size: 20px; color: var(--text-secondary); line-height: 1.8; }
+.pillar-number { font-family: 'Syne', sans-serif; font-size: 60px; font-weight: 900; color: #FFF099; opacity: 1; line-height: 1; margin-bottom: 16px; text-shadow: 0 0 16px rgba(255, 240, 153, 0.6); }
+.pillar-title  { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; color: #FFFFFF; margin-bottom: 12px; letter-spacing: -0.01em; text-shadow: 0 0 8px rgba(255, 255, 255, 0.3); }
+.pillar-body   { font-size: 15px; color: var(--text-secondary); line-height: 1.6; }
 
 /* ── HERO ── */
 .hero-eyebrow {
@@ -313,19 +313,19 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
     animation: fadeSlideUp 0.6s ease 0.1s both;
 }
 .hero-title {
-    font-family: 'Syne', sans-serif; font-size: clamp(80px, 12vw, 150px);
-    font-weight: 900; line-height: 0.95; color: var(--text-primary);
-    letter-spacing: -0.04em; margin-bottom: 24px;
+    font-family: 'Syne', sans-serif; font-size: clamp(50px, 8vw, 84px);
+    font-weight: 800; line-height: 1.05; color: var(--text-primary);
+    letter-spacing: -0.04em; margin-bottom: 16px;
     animation: fadeSlideDown 0.7s cubic-bezier(0.22,1,0.36,1) 0.15s both;
 }
 .hero-title span { color: var(--amber); }
 .hero-sub {
-    font-size: 26px; font-weight: 600; color: var(--text-secondary); line-height: 1.7; max-width: 800px;
+    font-size: 18px; font-weight: 400; color: var(--text-secondary); line-height: 1.6; max-width: 700px;
     animation: fadeSlideUp 0.6s ease 0.3s both;
 }
-.hero-stat-row { display: flex; gap: 50px; margin-top: 50px; animation: fadeSlideUp 0.6s ease 0.4s both; }
-.hero-stat-val { font-family: 'Syne', sans-serif; font-size: 56px; font-weight: 800; color: var(--amber); }
-.hero-stat-label { font-family: 'DM Mono', monospace; font-size: 18px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 6px; }
+.hero-stat-row { display: flex; gap: 32px; margin-top: 36px; animation: fadeSlideUp 0.6s ease 0.4s both; }
+.hero-stat-val { font-family: 'Syne', sans-serif; font-size: 36px; font-weight: 700; color: var(--amber); }
+.hero-stat-label { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
 
 /* ── PULSE DOT ── */
 .pulse-dot {
