@@ -1,22 +1,29 @@
-from google import genai
-from google.genai import types
 import os
 import json
 import time
+import base64
 from dotenv import load_dotenv
 import datetime
+from groq import Groq
 
 today = datetime.date.today().strftime("%d/%m/%Y")
 
-load_dotenv()
-client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+load_dotenv(override=True)
 
+def get_groq_client():
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError("GROQ_API_KEY is not set.")
+    return Groq(api_key=api_key)
 
 def audit_receipt(content, content_type, policy_text, filename, claimed_date, business_purpose, mime_type="image/jpeg"):
     """
-    Sends a receipt to Gemini and returns a structured verdict including extracted fields
-    and validation against Claimed Date and Business Purpose.
+    Sends a receipt to Groq (llama-3.2-90b-vision-preview) and returns a structured verdict.
     """
+    try:
+        client = get_groq_client()
+    except Exception as e:
+        return _error_result(f"Initialization error: {str(e)}")
 
     sys_instruct = f"""
 You are a strict, fair expense auditor.
@@ -97,61 +104,53 @@ Verdict definitions:
   REJECTED  → Clearly violates policy rules, unreadable receipt, dates impossible, OR fake_risk is HIGH.
 """
 
-    config = types.GenerateContentConfig(
-        system_instruction=sys_instruct,
-        temperature=0.0
-    )
-
     max_retries = 3
 
     for attempt in range(max_retries):
         try:
             if content_type == "text":
-                user_prompt = (
-                    f"Please audit this expense receipt ({filename}):\n\n{content}"
-                )
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-lite-001",
-                    contents=user_prompt,
-                    config=config
-                )
-
+                messages = [
+                    {"role": "system", "content": sys_instruct},
+                    {"role": "user", "content": f"Please audit this expense receipt ({filename}):\n\n{content}"}
+                ]
             elif content_type == "image":
-                image_part = types.Part.from_bytes(
-                    data=content,
-                    mime_type=mime_type
-                )
-                user_prompt = (
-                    f"The image attached is an expense receipt ({filename}). "
-                    "Read ALL visible text carefully — including small print."
-                )
-                response = client.models.generate_content(
-                    model="gemini-2.0-flash-lite-001",
-                    contents=[user_prompt, image_part],
-                    config=config
-                )
-
+                base64_image = base64.b64encode(content).decode('utf-8')
+                image_url = f"data:{mime_type};base64,{base64_image}"
+                messages = [
+                    {"role": "system", "content": sys_instruct},
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": f"The image attached is an expense receipt ({filename}). Read ALL visible text carefully — including small print."},
+                            {"type": "image_url", "image_url": {"url": image_url}}
+                        ]
+                    }
+                ]
             else:
                 return _error_result(f"Unsupported content type: '{content_type}'")
 
-            return parse_verdict(response.text)
+            response = client.chat.completions.create(
+                model="meta-llama/llama-4-scout-17b-16e-instruct",
+                messages=messages,
+                response_format={"type": "json_object"},
+                temperature=0.0
+            )
+
+            raw_text = response.choices[0].message.content
+            return parse_verdict(raw_text)
 
         except Exception as e:
             error_str = str(e)
-            # Handle quota / rate-limit errors with a clean message
-            if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            if "429" in error_str or "rate_limit_exceeded" in error_str.lower():
                 if attempt < max_retries - 1:
                     wait = 20 * (attempt + 1)
                     print(f"[auditor] Rate limit — waiting {wait}s (attempt {attempt+1}/{max_retries})…")
                     time.sleep(wait)
                     continue
                 else:
-                    return _error_result(
-                        "API quota exceeded. You have hit your daily free-tier limit for the Gemini API. "
-                        "Please wait ~24 hours for your quota to reset, or upgrade your Google AI plan."
-                    )
+                    return _error_result("API quota exceeded on Groq. Please check your rate limits for llama-3.2-90b-vision-preview.")
             else:
-                return _error_result(f"Gemini API error: {error_str}", raw=error_str)
+                return _error_result(f"Groq API error: {error_str}", raw=error_str)
 
 
 def _error_result(reason, raw=""):

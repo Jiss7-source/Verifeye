@@ -3,6 +3,7 @@
 # ─────────────────────────────────────────────
 import streamlit as st
 import datetime
+import os
 
 st.set_page_config(
     page_title="VerifEYE — Expense Auditor",
@@ -20,6 +21,11 @@ from database import (
     get_all_audits, get_flagged_audits, delete_all_audits
 )
 from auditor import audit_receipt
+
+try:
+    os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
+except KeyError:
+    pass
 
 # ─────────────────────────────────────────────
 #  CUSTOM CSS — DARK FINANCIAL COMMAND CENTRE
@@ -505,7 +511,7 @@ with st.sidebar:
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8A8A8E; margin-top:6px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#3DBA7A;display:inline-block;"></span>
-                Gemini 2.0 Flash Lite
+                Groq 90B Vision
             </div>
             <div style="display:flex; align-items:center; gap:8px; font-size:13px; color:#8A8A8E; margin-top:6px;">
                 <span style="width:6px;height:6px;border-radius:50%;background:#3DBA7A;display:inline-block;"></span>
@@ -590,22 +596,23 @@ def display_result(result: dict):
     pill_class = {"LOW": "pill-low", "MEDIUM": "pill-medium", "HIGH": "pill-high"}.get(fake_r, "pill-unknown")
 
     # Warning banner (FLAGGED only)
+    # Warning banner (FLAGGED only)
     banner_html = ""
     if cfg["banner"]:
         banner_html = f"""
-        <div class="flagged-warning">
-            <span style="font-size:18px;flex-shrink:0;">⚠</span>
-            <span>{cfg['banner']}</span>
-        </div>"""
+<div class="flagged-warning">
+  <span style="font-size:18px;flex-shrink:0;">⚠</span>
+  <span>{cfg['banner']}</span>
+</div>"""
 
     # Violations
     viol_html = ""
     if viol and viol.lower() not in ("none", "n/a", ""):
         viol_html = f"""
-        <div class="violations-block">
-            <strong style="font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.15em;">Policy Violations</strong><br>
-            {viol}
-        </div>"""
+<div class="violations-block">
+  <strong style="font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.15em;">Policy Violations</strong><br>
+  {viol}
+</div>"""
 
     # Fraud signals
     signals_html = ""
@@ -621,38 +628,34 @@ def display_result(result: dict):
       <div class="verdict-subtitle">{cfg['subtitle']}</div>
     </div>
   </div>
-
   <div class="verdict-body">
-    {banner_html}
-
-    <div class="reason-box {cfg['reason_class']}">
-        <strong style="font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.15em;">Audit Finding</strong><br>
-        {reason}
+{banner_html}
+<div class="reason-box {cfg['reason_class']}">
+  <strong style="font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase; letter-spacing:0.15em;">Audit Finding</strong><br>
+  {reason}
+</div>
+<div class="result-grid">
+  <div class="result-cell">
+    <div class="result-cell-label">Merchant</div>
+    <div class="result-cell-value">{merchant}</div>
+  </div>
+  <div class="result-cell">
+    <div class="result-cell-label">Receipt Date</div>
+    <div class="result-cell-value">{rec_date}</div>
+  </div>
+  <div class="result-cell">
+    <div class="result-cell-label">Extracted Total</div>
+    <div class="result-cell-value">{full_amount}</div>
+  </div>
+  <div class="result-cell">
+    <div class="result-cell-label">Authenticity Check</div>
+    <div class="result-cell-value">
+      <span class="fraud-pill {pill_class}">{fake_r if fake_r != 'UNKNOWN' else '—'} risk</span>
     </div>
-
-    <div class="result-grid">
-      <div class="result-cell">
-        <div class="result-cell-label">Merchant</div>
-        <div class="result-cell-value">{merchant}</div>
-      </div>
-      <div class="result-cell">
-        <div class="result-cell-label">Receipt Date</div>
-        <div class="result-cell-value">{rec_date}</div>
-      </div>
-      <div class="result-cell">
-        <div class="result-cell-label">Extracted Total</div>
-        <div class="result-cell-value">{full_amount}</div>
-      </div>
-      <div class="result-cell">
-        <div class="result-cell-label">Authenticity Check</div>
-        <div class="result-cell-value">
-            <span class="fraud-pill {pill_class}">{fake_r if fake_r != 'UNKNOWN' else '—'} risk</span>
-        </div>
-      </div>
-    </div>
-
-    {viol_html}
-    {signals_html}
+  </div>
+</div>
+{viol_html}
+{signals_html}
   </div>
 </div>
 """
@@ -673,7 +676,7 @@ if page == "◆  Audit Console":
             </div>
             <div class="hero-title">Verif<span>EYE</span></div>
             <div class="hero-sub">
-                Intelligent receipt auditing powered by Gemini 2.0 Flash Lite. Upload any expense receipt and get a policy-grounded verdict in seconds.
+                Intelligent receipt auditing powered by Groq Llama 90B Vision. Upload any expense receipt and get a policy-grounded verdict in seconds.
             </div>
             <div class="hero-stat-row">
                 <div>
@@ -751,9 +754,9 @@ if page == "◆  Audit Console":
                     reason = result.get("reason", "Unknown API error.")
                     if "quota" in reason.lower() or "429" in reason or "resource_exhausted" in reason.lower():
                         st.error(
-                            "🛑 **Gemini API Quota Exceeded**\n\n"
-                            "You have reached your daily free-tier limit (20 requests/day for this model). "
-                            "Please wait ~24 hours for your quota to reset, or upgrade your Google AI API plan at [ai.dev](https://ai.dev)."
+                            "🛑 **API Quota Exceeded**\n\n"
+                            "You have reached your daily free-tier limit. "
+                            "Please wait ~24 hours for your quota to reset or upgrade your plan."
                         )
                     else:
                         st.error(f"❌ **API Error:** {reason}")
