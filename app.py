@@ -334,7 +334,7 @@ details summary { color: var(--text-primary) !important; font-family: 'DM Mono',
 .page-header p  { color: var(--text-secondary); font-size: 15px; margin: 0; }
 
 /* ── HIDE STREAMLIT CHROME ── */
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
 .block-container { padding-top: 2rem !important; }
 
 /* ═══════════════════════════════════════════════════
